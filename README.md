@@ -4,12 +4,12 @@ A standalone NestJS API server for the N-Point System with dummy data for testin
 
 ## Features
 
-- **Point Ledger API**: View balances, transactions, and statistics
-- **Purchase API**: Browse packages, initiate purchases (Stripe & Crypto)
-- **Token Swap API**: Calculate swaps, create swap requests, view history
+- **Point Ledger API**: View balances, earn points, transactions, and statistics
 - **API Key Authentication**: Hardcoded API key for easy testing
 - **Swagger Documentation**: Interactive API documentation
 - **No Database Required**: All data is mocked in memory
+
+**Note:** Purchase and Token Swap endpoints are currently hidden and will be enabled in future updates.
 
 ## Quick Start
 
@@ -91,81 +91,45 @@ curl -X GET http://localhost:3001/api/v1/points/balance \
 ### Get Transaction History
 
 ```bash
-curl -X GET "http://localhost:3001/api/v1/points/transactions?page=1&limit=10" \
+curl -X GET "http://localhost:3001/api/points/transactions?page=1&limit=10" \
   -H "X-API-Key: nxt_live_demo_key_123456789" \
   -H "X-User-Id: user-001"
 ```
 
-### List Purchase Packages
+### Earn Points
 
 ```bash
-curl -X GET http://localhost:3001/api/v1/purchases/packages \
-  -H "X-API-Key: nxt_live_demo_key_123456789"
-```
-
-### Create Stripe Checkout
-
-```bash
-curl -X POST http://localhost:3001/api/v1/purchases/stripe/checkout \
+curl -X POST http://localhost:3001/api/points/earn \
   -H "X-API-Key: nxt_live_demo_key_123456789" \
   -H "X-User-Id: user-001" \
   -H "Content-Type: application/json" \
   -d '{
-    "packageId": "pkg-001",
-    "successUrl": "https://example.com/success",
-    "cancelUrl": "https://example.com/cancel"
+    "action": "DAILY_LOGIN"
   }'
 ```
 
-### Calculate Token Swap
+### Get User Statistics
 
 ```bash
-curl -X POST http://localhost:3001/api/v1/swaps/calculate \
+curl -X GET http://localhost:3001/api/points/stats \
   -H "X-API-Key: nxt_live_demo_key_123456789" \
-  -H "X-User-Id: user-001" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "pointsAmount": 1000
-  }'
-```
-
-### Create Token Swap
-
-```bash
-curl -X POST http://localhost:3001/api/v1/swaps \
-  -H "X-API-Key: nxt_live_demo_key_123456789" \
-  -H "X-User-Id: user-001" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "pointsAmount": 1000,
-    "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb"
-  }'
+  -H "X-User-Id: user-001"
 ```
 
 ## Available Endpoints
 
-### Point Ledger
-- `GET /api/v1/points/balance` - Get user balance
-- `GET /api/v1/points/transactions` - Get transaction history
-- `GET /api/v1/points/transactions/:id` - Get transaction details
-- `GET /api/v1/points/stats` - Get user statistics
+### Point Ledger (Active)
+- `GET /api/points/balance` - Get user balance
+- `POST /api/points/earn` - Earn points from user actions
+- `GET /api/points/transactions` - Get transaction history
+- `GET /api/points/transactions/:id` - Get transaction details
+- `GET /api/points/stats` - Get user statistics
 
-### Purchases
-- `GET /api/v1/purchases/packages` - List packages
-- `GET /api/v1/purchases/packages/:id` - Get package details
-- `POST /api/v1/purchases/stripe/checkout` - Create Stripe checkout
-- `POST /api/v1/purchases/crypto/initiate` - Initiate crypto payment
-- `GET /api/v1/purchases/crypto/:id/status` - Check crypto payment status
-- `GET /api/v1/purchases/history` - Get purchase history
-- `GET /api/v1/purchases/:id` - Get purchase details
+### Purchases (Hidden)
+_Coming soon - endpoints currently disabled_
 
-### Token Swaps
-- `GET /api/v1/swaps/config` - Get swap configuration
-- `POST /api/v1/swaps/calculate` - Calculate token amount
-- `POST /api/v1/swaps` - Create swap request
-- `GET /api/v1/swaps` - Get swap history
-- `GET /api/v1/swaps/:id` - Get swap details
-- `GET /api/v1/swaps/limits` - Get user swap limits
+### Token Swaps (Hidden)
+_Coming soon - endpoints currently disabled_
 
 ## Configuration
 
@@ -183,11 +147,9 @@ CORS_ORIGIN=*
 The server includes pre-populated dummy data:
 
 - **2 Demo Users**: user-001, user-002
-- **5 Transactions**: Various types (EARN, SPEND, PURCHASE, SWAP)
-- **3 Purchase Packages**: Starter, Basic, Popular
-- **2 Purchase Records**: One completed (Stripe), one processing (Crypto)
-- **2 Swap Records**: One completed, one processing
-- **Swap Configuration**: Exchange rates, limits, etc.
+- **Point Balances**: Free points, paid points, and locked points
+- **5 Transactions**: Sample transaction history (EARN, SPEND types)
+- **9 Earn Actions**: DAILY_LOGIN, COMPLETE_PROFILE, FIRST_GENERATION, SHARE_CONTENT, REFERRAL, WATCH_AD, COMPLETE_TASK, ACHIEVEMENT, BONUS
 
 You can find and modify the dummy data in `src/common/data/dummy-data.ts`
 

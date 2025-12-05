@@ -28,127 +28,129 @@ export class SwapsController {
     };
   }
 
-  @Post('calculate')
-  @ApiOperation({
-    summary: 'Calculate tokens for user-defined point amount',
-    description: 'Preview how many $NXT tokens you will receive for ANY amount of points you want to swap (100-50,000 points). This does NOT create a swap, just shows the calculation.',
-  })
-  @ApiBody({
-    type: CalculateSwapDto,
-    description: 'Specify how many points you want to swap',
-    examples: {
-      small: {
-        value: { pointsAmount: 500 },
-        summary: 'Small swap (500 points)',
-      },
-      medium: {
-        value: { pointsAmount: 2500 },
-        summary: 'Medium swap (2,500 points)',
-      },
-      large: {
-        value: { pointsAmount: 10000 },
-        summary: 'Large swap (10,000 points)',
-      },
-    },
-  })
-  @ApiHeader({
-    name: 'X-User-Id',
-    description: 'User ID (optional, defaults to user-001)',
-    required: false,
-  })
-  calculateSwap(
-    @UserId() userId: string,
-    @Body() dto: CalculateSwapDto,
-  ) {
-    const { pointsAmount } = dto;
-    const { exchangeRate } = DUMMY_SWAP_CONFIG;
+  // Hidden for now - will be enabled in future updates
+  // @Post('calculate')
+  // @ApiOperation({
+  //   summary: 'Calculate tokens for user-defined point amount',
+  //   description: 'Preview how many $NXT tokens you will receive for ANY amount of points you want to swap (100-50,000 points). This does NOT create a swap, just shows the calculation.',
+  // })
+  // @ApiBody({
+  //   type: CalculateSwapDto,
+  //   description: 'Specify how many points you want to swap',
+  //   examples: {
+  //     small: {
+  //       value: { pointsAmount: 500 },
+  //       summary: 'Small swap (500 points)',
+  //     },
+  //     medium: {
+  //       value: { pointsAmount: 2500 },
+  //       summary: 'Medium swap (2,500 points)',
+  //     },
+  //     large: {
+  //       value: { pointsAmount: 10000 },
+  //       summary: 'Large swap (10,000 points)',
+  //     },
+  //   },
+  // })
+  // @ApiHeader({
+  //   name: 'X-User-Id',
+  //   description: 'User ID (optional, defaults to user-001)',
+  //   required: false,
+  // })
+  // calculateSwap(
+  //   @UserId() userId: string,
+  //   @Body() dto: CalculateSwapDto,
+  // ) {
+  //   const { pointsAmount } = dto;
+  //   const { exchangeRate } = DUMMY_SWAP_CONFIG;
 
-    const tokenAmount = pointsAmount * exchangeRate;
-    const limits = DUMMY_SWAP_LIMITS[userId] || DUMMY_SWAP_LIMITS['user-001'];
+  //   const tokenAmount = pointsAmount * exchangeRate;
+  //   const limits = DUMMY_SWAP_LIMITS[userId] || DUMMY_SWAP_LIMITS['user-001'];
 
-    return {
-      success: true,
-      data: {
-        pointsAmount,
-        tokenAmount,
-        exchangeRate,
-        estimatedGasFee: 0.0001,
-        estimatedTimeSeconds: 300,
-        userLimits: {
-          dailyRemaining: limits.daily.remaining,
-          monthlyRemaining: limits.monthly.remaining,
-        },
-      },
-      timestamp: new Date().toISOString(),
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data: {
+  //       pointsAmount,
+  //       tokenAmount,
+  //       exchangeRate,
+  //       estimatedGasFee: 0.0001,
+  //       estimatedTimeSeconds: 300,
+  //       userLimits: {
+  //         dailyRemaining: limits.daily.remaining,
+  //         monthlyRemaining: limits.monthly.remaining,
+  //       },
+  //     },
+  //     timestamp: new Date().toISOString(),
+  //   };
+  // }
 
-  @Post()
-  @ApiOperation({
-    summary: 'Create swap for user-defined point amount',
-    description: 'Create a swap request to convert YOUR CHOSEN amount of paid points to $NXT tokens. You specify exactly how many points (100-50,000) you want to swap.',
-  })
-  @ApiBody({
-    type: CreateSwapDto,
-    description: 'Specify how many points you want to swap and your wallet address',
-    examples: {
-      example1: {
-        value: {
-          pointsAmount: 1000,
-          walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-        },
-        summary: 'Swap 1,000 points → 1.0 $NXT',
-      },
-      example2: {
-        value: {
-          pointsAmount: 5000,
-          walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-        },
-        summary: 'Swap 5,000 points → 5.0 $NXT',
-      },
-      example3: {
-        value: {
-          pointsAmount: 10000,
-          walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-        },
-        summary: 'Swap 10,000 points → 10.0 $NXT',
-      },
-    },
-  })
-  @ApiHeader({
-    name: 'X-User-Id',
-    description: 'User ID (optional, defaults to user-001)',
-    required: false,
-  })
-  createSwap(
-    @UserId() userId: string,
-    @Body() dto: CreateSwapDto,
-  ) {
-    const { pointsAmount, walletAddress } = dto;
-    const { exchangeRate } = DUMMY_SWAP_CONFIG;
-    const tokenAmount = pointsAmount * exchangeRate;
+  // Hidden for now - will be enabled in future updates
+  // @Post()
+  // @ApiOperation({
+  //   summary: 'Create swap for user-defined point amount',
+  //   description: 'Create a swap request to convert YOUR CHOSEN amount of paid points to $NXT tokens. You specify exactly how many points (100-50,000) you want to swap.',
+  // })
+  // @ApiBody({
+  //   type: CreateSwapDto,
+  //   description: 'Specify how many points you want to swap and your wallet address',
+  //   examples: {
+  //     example1: {
+  //       value: {
+  //         pointsAmount: 1000,
+  //         walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+  //       },
+  //       summary: 'Swap 1,000 points → 1.0 $NXT',
+  //     },
+  //     example2: {
+  //       value: {
+  //         pointsAmount: 5000,
+  //         walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+  //       },
+  //       summary: 'Swap 5,000 points → 5.0 $NXT',
+  //     },
+  //     example3: {
+  //       value: {
+  //         pointsAmount: 10000,
+  //         walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+  //       },
+  //       summary: 'Swap 10,000 points → 10.0 $NXT',
+  //     },
+  //   },
+  // })
+  // @ApiHeader({
+  //   name: 'X-User-Id',
+  //   description: 'User ID (optional, defaults to user-001)',
+  //   required: false,
+  // })
+  // createSwap(
+  //   @UserId() userId: string,
+  //   @Body() dto: CreateSwapDto,
+  // ) {
+  //   const { pointsAmount, walletAddress } = dto;
+  //   const { exchangeRate } = DUMMY_SWAP_CONFIG;
+  //   const tokenAmount = pointsAmount * exchangeRate;
 
-    const swapId = `swap-${Date.now()}`;
+  //   const swapId = `swap-${Date.now()}`;
 
-    return {
-      success: true,
-      data: {
-        swapId,
-        pointsAmount,
-        tokenAmount,
-        exchangeRate,
-        walletAddress,
-        status: 'PENDING',
-        estimatedCompletionTime: new Date(
-          Date.now() + 5 * 60 * 1000,
-        ).toISOString(),
-        createdAt: new Date().toISOString(),
-      },
-      message:
-        'Swap request created successfully. Points have been locked and will be processed shortly. (DEMO MODE)',
-      timestamp: new Date().toISOString(),
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data: {
+  //       swapId,
+  //       pointsAmount,
+  //       tokenAmount,
+  //       exchangeRate,
+  //       walletAddress,
+  //       status: 'PENDING',
+  //       estimatedCompletionTime: new Date(
+  //         Date.now() + 5 * 60 * 1000,
+  //       ).toISOString(),
+  //       createdAt: new Date().toISOString(),
+  //     },
+  //     message:
+  //       'Swap request created successfully. Points have been locked and will be processed shortly. (DEMO MODE)',
+  //     timestamp: new Date().toISOString(),
+  //   };
+  // }
 
   @Get()
   @ApiOperation({ summary: 'Get swap history' })

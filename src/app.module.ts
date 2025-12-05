@@ -10,8 +10,8 @@ import { SwapsModule } from './swaps/swaps.module';
       isGlobal: true,
     }),
     PointsModule,
-    PurchasesModule,
-    SwapsModule,
+    PurchasesModule, // Only GET endpoints active (POST endpoints hidden)
+    SwapsModule, // Only GET endpoints active (POST endpoints hidden)
   ],
 })
 export class AppModule {}

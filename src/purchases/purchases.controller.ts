@@ -52,107 +52,109 @@ export class PurchasesController {
     };
   }
 
-  @Post('stripe/checkout')
-  @ApiOperation({ summary: 'Create Stripe checkout session' })
-  @ApiHeader({
-    name: 'X-User-Id',
-    description: 'User ID (optional, defaults to user-001)',
-    required: false,
-  })
-  createStripeCheckout(
-    @UserId() userId: string,
-    @Body() body: { packageId: string; successUrl: string; cancelUrl: string },
-  ) {
-    const pkg = DUMMY_PACKAGES.find((p) => p.id === body.packageId);
+  // Hidden for now - will be enabled in future updates
+  // @Post('stripe/checkout')
+  // @ApiOperation({ summary: 'Create Stripe checkout session' })
+  // @ApiHeader({
+  //   name: 'X-User-Id',
+  //   description: 'User ID (optional, defaults to user-001)',
+  //   required: false,
+  // })
+  // createStripeCheckout(
+  //   @UserId() userId: string,
+  //   @Body() body: { packageId: string; successUrl: string; cancelUrl: string },
+  // ) {
+  //   const pkg = DUMMY_PACKAGES.find((p) => p.id === body.packageId);
 
-    if (!pkg) {
-      return {
-        success: false,
-        error: {
-          code: 'NOT_FOUND',
-          message: 'Package not found',
-        },
-        timestamp: new Date().toISOString(),
-      };
-    }
+  //   if (!pkg) {
+  //     return {
+  //       success: false,
+  //       error: {
+  //         code: 'NOT_FOUND',
+  //         message: 'Package not found',
+  //       },
+  //       timestamp: new Date().toISOString(),
+  //     };
+  //   }
 
-    // Mock Stripe checkout session
-    const sessionId = `cs_test_${Math.random().toString(36).substring(7)}`;
-    const purchaseId = `purchase-${Date.now()}`;
+  //   // Mock Stripe checkout session
+  //   const sessionId = `cs_test_${Math.random().toString(36).substring(7)}`;
+  //   const purchaseId = `purchase-${Date.now()}`;
 
-    return {
-      success: true,
-      data: {
-        sessionId,
-        checkoutUrl: `https://checkout.stripe.com/c/pay/${sessionId}`,
-        purchaseId,
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-      },
-      message: 'Checkout session created successfully (DEMO MODE)',
-      timestamp: new Date().toISOString(),
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data: {
+  //       sessionId,
+  //       checkoutUrl: `https://checkout.stripe.com/c/pay/${sessionId}`,
+  //       purchaseId,
+  //       expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+  //     },
+  //     message: 'Checkout session created successfully (DEMO MODE)',
+  //     timestamp: new Date().toISOString(),
+  //   };
+  // }
 
-  @Post('crypto/initiate')
-  @ApiOperation({ summary: 'Initiate crypto payment' })
-  @ApiHeader({
-    name: 'X-User-Id',
-    description: 'User ID (optional, defaults to user-001)',
-    required: false,
-  })
-  initiateCryptoPayment(
-    @UserId() userId: string,
-    @Body() body: { packageId: string; cryptoCurrency: string; network: string },
-  ) {
-    const pkg = DUMMY_PACKAGES.find((p) => p.id === body.packageId);
+  // Hidden for now - will be enabled in future updates
+  // @Post('crypto/initiate')
+  // @ApiOperation({ summary: 'Initiate crypto payment' })
+  // @ApiHeader({
+  //   name: 'X-User-Id',
+  //   description: 'User ID (optional, defaults to user-001)',
+  //   required: false,
+  // })
+  // initiateCryptoPayment(
+  //   @UserId() userId: string,
+  //   @Body() body: { packageId: string; cryptoCurrency: string; network: string },
+  // ) {
+  //   const pkg = DUMMY_PACKAGES.find((p) => p.id === body.packageId);
 
-    if (!pkg) {
-      return {
-        success: false,
-        error: {
-          code: 'NOT_FOUND',
-          message: 'Package not found',
-        },
-        timestamp: new Date().toISOString(),
-      };
-    }
+  //   if (!pkg) {
+  //     return {
+  //       success: false,
+  //       error: {
+  //         code: 'NOT_FOUND',
+  //         message: 'Package not found',
+  //       },
+  //       timestamp: new Date().toISOString(),
+  //     };
+  //   }
 
-    const crypto = pkg.pricing.crypto.currencies.find(
-      (c) => c.currency === body.cryptoCurrency,
-    );
+  //   const crypto = pkg.pricing.crypto.currencies.find(
+  //     (c) => c.currency === body.cryptoCurrency,
+  //   );
 
-    if (!crypto) {
-      return {
-        success: false,
-        error: {
-          code: 'UNSUPPORTED_CURRENCY',
-          message: 'Cryptocurrency not supported for this package',
-        },
-        timestamp: new Date().toISOString(),
-      };
-    }
+  //   if (!crypto) {
+  //     return {
+  //       success: false,
+  //       error: {
+  //         code: 'UNSUPPORTED_CURRENCY',
+  //         message: 'Cryptocurrency not supported for this package',
+  //       },
+  //       timestamp: new Date().toISOString(),
+  //     };
+  //   }
 
-    // Mock crypto payment
-    const purchaseId = `purchase-${Date.now()}`;
-    const paymentAddress = `0x${Math.random().toString(16).substring(2, 42)}`;
+  //   // Mock crypto payment
+  //   const purchaseId = `purchase-${Date.now()}`;
+  //   const paymentAddress = `0x${Math.random().toString(16).substring(2, 42)}`;
 
-    return {
-      success: true,
-      data: {
-        purchaseId,
-        paymentAddress,
-        amount: crypto.amount,
-        currency: crypto.currency,
-        network: body.network,
-        qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-        status: 'PENDING',
-        minimumConfirmations: 12,
-      },
-      message: `Send exactly ${crypto.amount} ${crypto.currency} to the payment address (DEMO MODE)`,
-      timestamp: new Date().toISOString(),
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data: {
+  //       purchaseId,
+  //       paymentAddress,
+  //       amount: crypto.amount,
+  //       currency: crypto.currency,
+  //       network: body.network,
+  //       qrCode: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  //       expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+  //       status: 'PENDING',
+  //       minimumConfirmations: 12,
+  //     },
+  //     message: `Send exactly ${crypto.amount} ${crypto.currency} to the payment address (DEMO MODE)`,
+  //     timestamp: new Date().toISOString(),
+  //   };
+  // }
 
   @Get('crypto/:id/status')
   @ApiOperation({ summary: 'Check crypto payment status' })
