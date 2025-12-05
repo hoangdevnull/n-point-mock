@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiSecurity, ApiHeader, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Post, Query, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiSecurity, ApiHeader, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { UserId } from '../common/decorators/user-id.decorator';
+import { EarnPointsDto, EarnAction } from './dto/earn-points.dto';
 import {
   DUMMY_BALANCES,
   DUMMY_TRANSACTIONS,
@@ -32,6 +33,115 @@ export class PointsController {
       },
       timestamp: new Date().toISOString(),
     };
+  }
+
+  @Post('earn')
+  @ApiOperation({
+    summary: 'Earn free points from user actions',
+    description: 'Award free points to users for completing various actions like daily login, sharing, completing tasks, etc.',
+  })
+  @ApiBody({
+    type: EarnPointsDto,
+    description: 'Specify the action that earns points',
+    examples: {
+      dailyLogin: {
+        value: { action: 'DAILY_LOGIN' },
+        summary: 'Daily login bonus (+50 points)',
+      },
+      shareContent: {
+        value: { action: 'SHARE_CONTENT' },
+        summary: 'Share content (+25 points)',
+      },
+      completeTask: {
+        value: {
+          action: 'COMPLETE_TASK',
+          amount: 100,
+          metadata: { taskId: 'task-001', taskName: 'Create first AI image' }
+        },
+        summary: 'Complete task (+100 points)',
+      },
+      referral: {
+        value: {
+          action: 'REFERRAL',
+          amount: 500,
+          metadata: { referredUserId: 'user-002' }
+        },
+        summary: 'Referral bonus (+500 points)',
+      },
+    },
+  })
+  @ApiHeader({
+    name: 'X-User-Id',
+    description: 'User ID (optional, defaults to user-001)',
+    required: false,
+  })
+  earnPoints(@UserId() userId: string, @Body() dto: EarnPointsDto) {
+    const { action, amount, metadata } = dto;
+
+    // Default point amounts for different actions
+    const defaultAmounts: Record<EarnAction, number> = {
+      [EarnAction.DAILY_LOGIN]: 50,
+      [EarnAction.COMPLETE_PROFILE]: 100,
+      [EarnAction.FIRST_GENERATION]: 200,
+      [EarnAction.SHARE_CONTENT]: 25,
+      [EarnAction.REFERRAL]: 500,
+      [EarnAction.WATCH_AD]: 10,
+      [EarnAction.COMPLETE_TASK]: 100,
+      [EarnAction.ACHIEVEMENT]: 150,
+      [EarnAction.BONUS]: 50,
+    };
+
+    const pointsEarned = amount || defaultAmounts[action];
+    const balance = DUMMY_BALANCES[userId] || DUMMY_BALANCES['user-001'];
+    const newBalance = balance.freePoints + pointsEarned;
+
+    // Create transaction
+    const transaction = {
+      id: `trans-${Date.now()}`,
+      userId,
+      transactionType: 'EARN',
+      pointType: 'FREE',
+      amount: pointsEarned,
+      balanceAfter: newBalance,
+      description: this.getActionDescription(action, metadata),
+      referenceType: action,
+      referenceId: metadata?.taskId || metadata?.achievementId || null,
+      metadata,
+      createdAt: new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      data: {
+        transactionId: transaction.id,
+        action,
+        pointsEarned,
+        newBalance: {
+          freePoints: newBalance,
+          paidPoints: balance.paidPoints,
+          totalPoints: newBalance + balance.paidPoints,
+        },
+        transaction,
+      },
+      message: `You earned ${pointsEarned} free points for ${this.getActionDescription(action, metadata)}!`,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private getActionDescription(action: EarnAction, metadata?: any): string {
+    const descriptions: Record<EarnAction, string> = {
+      [EarnAction.DAILY_LOGIN]: 'daily login bonus',
+      [EarnAction.COMPLETE_PROFILE]: 'completing your profile',
+      [EarnAction.FIRST_GENERATION]: 'your first AI generation',
+      [EarnAction.SHARE_CONTENT]: 'sharing content',
+      [EarnAction.REFERRAL]: `referring ${metadata?.referredUserId || 'a friend'}`,
+      [EarnAction.WATCH_AD]: 'watching an advertisement',
+      [EarnAction.COMPLETE_TASK]: metadata?.taskName || 'completing a task',
+      [EarnAction.ACHIEVEMENT]: metadata?.achievementName || 'unlocking an achievement',
+      [EarnAction.BONUS]: metadata?.reason || 'bonus points',
+    };
+
+    return descriptions[action];
   }
 
   @Get('transactions')
